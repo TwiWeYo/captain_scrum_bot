@@ -24,6 +24,9 @@ async def choise_random(message):
         channel = await get_channel_byname(message, args[1])
     else:
         channel = await get_channel(message)
+        
+    if not channel:
+        return
 
     members = channel.members
     if not members:

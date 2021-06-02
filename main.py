@@ -46,7 +46,7 @@ async def get_channel_byname(message, ch_name):
     guild = message.guild
     channel = [x for x in guild.channels if x.name.lower() == ch_name and str(x.type) == 'voice']
     if not channel:
-        await message.channel.send(f'{sad_prefix()} голосовой канал "{channel_name}" найти не удалось')
+        await message.channel.send(f'{sad_prefix()} голосовой канал "{ch_name}" найти не удалось')
         return
     return channel[0]
 

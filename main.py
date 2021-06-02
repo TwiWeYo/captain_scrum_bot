@@ -5,11 +5,10 @@ import random
 guildname = 'talking scientific pizza'
 intents = discord.Intents.all()
 client = discord.Client(intents=intents)
-tsp = []
 
 sad_prefixes = ['увы, но', 'вынужден огорчить, господа, но', 'вот незадача,', 'бесконечно извиняюсь, но', 'как ни прескорбно, но', 'сожалею, но именно сегодня', 'так уж вышло, что']
+joy_prefixes = ['счастливый случай выбрал {}', 'перенаправляем прожекторы... всё внимание на {}!', 'поздравляю! самый счастливый человек сегодня — {}', 'герой сегодняшнего дня — {}', 'а самый красивый голос в канале — у {}, вот послушайте', 'как ни крутись, но тут без {} не обойтись', 'победитель розыгрыша — {}', 'человек-легенда, лауреат премии "их выбрал рандом" — {}', 'случайности не случайны, {} знает это, как никто другой']
 
-joy_prefixes = ['счастливый случай выбрал', 'переключаем прожекторы... всё внимание на', 'поздравляю! самый счастливый человек сегодня —', 'герой сегодняшнего дня —', 'а самый красивый голос в канале — у', 'как ни крутись, но не обойтись без', 'победитель розыгрыша —', 'человек-легенда, лауреат премии "их выбрал рандом" —', 'случайности не случайны, лучше всех об этом знает']
 
 def sad_prefix():
     return random.choice(sad_prefixes)
@@ -20,30 +19,44 @@ def joy_prefix():
 
 
 async def choise_random(message):
-    global tsp
-
     args = message.content.split()
-    channel_name = 'основной' if len(args) < 2 else args[1]
 
-    channel = [x for x in tsp.channels if x.name.lower() == channel_name and str(x.type) == 'voice']
-    if not channel:
-        await message.channel.send(f'{sad_prefix()} голосовой канал "{channel_name}" найти не удалось')
-        return
+    if len(args) >= 2:
+        channel = await get_channel_byname(message, args[1])
+    else:
+        channel = await get_channel(message)
 
-    members = channel[0].members
+    members = channel.members
     if not members:
         await message.channel.send(f'{sad_prefix()} в канале "{channel_name}" никого нет')
         return
 
+    await message.channel.send(joy_prefix().format(random.choice(members).mention))
+
+
+async def get_channel(message):
+    guild = client.guilds[message.guild_id]
+    channel = [x for x in guild.channels if message.author in x.members]
+    if not members:
+        await message.channel.send(f'{sad_prefix()} {message.author.mention} не удалось найти ни в одном из каналов')
+        return
+
     await message.channel.send(f'{joy_prefix()} {random.choice(members).mention}')
+
+
+async def get_channel_byname(message, ch_name):
+    guild = client.guilds[message.guild_id]
+    channel = [x for x in guild.channels if x.name.lower() == ch_name and str(x.type) == 'voice']
+    if not channel:
+        await message.channel.send(f'{sad_prefix()} голосовой канал "{channel_name}" найти не удалось')
+        return
+    channel = channel[0]
 
 
 @client.event
 async def on_ready():
     global tsp
     print('We have logged in as {0.user}'.format(client))
-
-    tsp = [x for x in client.guilds if x.name == guildname][0]
 
 
 @client.event

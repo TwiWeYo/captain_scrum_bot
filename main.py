@@ -1,5 +1,4 @@
 import discord
-import os
 import random
 
 guildname = 'talking scientific pizza'
@@ -35,22 +34,21 @@ async def choise_random(message):
 
 
 async def get_channel(message):
-    guild = client.guilds[message.guild_id]
-    channel = [x for x in guild.channels if message.author in x.members]
-    if not members:
+    guild = message.guild
+    channel = [x for x in guild.channels if str(x.type) == 'voice' and message.author in x.members]
+    if not channel:
         await message.channel.send(f'{sad_prefix()} {message.author.mention} не удалось найти ни в одном из каналов')
         return
-
-    await message.channel.send(f'{joy_prefix()} {random.choice(members).mention}')
+    return channel[0]
 
 
 async def get_channel_byname(message, ch_name):
-    guild = client.guilds[message.guild_id]
+    guild = message.guild
     channel = [x for x in guild.channels if x.name.lower() == ch_name and str(x.type) == 'voice']
     if not channel:
         await message.channel.send(f'{sad_prefix()} голосовой канал "{channel_name}" найти не удалось')
         return
-    channel = channel[0]
+    return channel[0]
 
 
 @client.event
@@ -68,4 +66,4 @@ async def on_message(message):
         await choise_random(message)
         
 
-client.run(os.environ['TOKEN'])
+client.run('TOKEN')

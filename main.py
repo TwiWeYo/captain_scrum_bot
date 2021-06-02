@@ -7,11 +7,16 @@ intents = discord.Intents.all()
 client = discord.Client(intents=intents)
 tsp = []
 
-prefixes = ['увы, но', 'вынужден огорчить, господа, но', 'вот незадача,', 'бесконечно извиняюсь, но', 'как ни прескорбно, но', 'сожалею, но именно сегодня', 'так уж вышло, что']
+sad_prefixes = ['увы, но', 'вынужден огорчить, господа, но', 'вот незадача,', 'бесконечно извиняюсь, но', 'как ни прескорбно, но', 'сожалею, но именно сегодня', 'так уж вышло, что']
+
+joy_prefixes = ['счастливый случай выбрал', 'переключаем прожектора... всё внимание на', 'поздравляю! самый счастливый человек сегодня —', 'герой сегодняшнего дня —']
+
+def sad_prefix():
+    return random.choice(sad_prefixes)
 
 
-def prefix():
-    return random.choice(prefixes)
+def joy_prefix():
+  return random.choice(joy_prefixes)
 
 
 async def choise_random(message):
@@ -22,15 +27,15 @@ async def choise_random(message):
 
     channel = [x for x in tsp.channels if x.name.lower() == channel_name and str(x.type) == 'voice']
     if not channel:
-        await message.channel.send(f'{prefix()} голосовой канал "{channel_name}" найти не удалось')
+        await message.channel.send(f'{sad_prefix()} голосовой канал "{channel_name}" найти не удалось')
         return
 
     members = channel[0].members
     if not members:
-        await message.channel.send(f'{prefix()} в канале "{channel_name}" никого нет')
+        await message.channel.send(f'{sad_prefix()} в канале "{channel_name}" никого нет')
         return
 
-    await message.channel.send(f'счастливый случай выбрал {random.choice(members).mention}')
+    await message.channel.send(f'{joy_prefix()} {random.choice(members).mention}')
 
 
 @client.event

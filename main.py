@@ -27,7 +27,7 @@ def choise_member(members):
             probabilities[h] /= 2
     p = []
     v = []
-    for val, pr in probabilities:
+    for val, pr in probabilities.items():
         v.append(val)
         p.append(pr)
             

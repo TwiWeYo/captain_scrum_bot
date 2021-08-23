@@ -2,7 +2,6 @@ import discord
 import random
 from collections import deque
 
-guildname = 'talking scientific pizza'
 intents = discord.Intents.all()
 client = discord.Client(intents=intents)
 

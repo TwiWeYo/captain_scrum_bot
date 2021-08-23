@@ -101,7 +101,7 @@ async def on_message(message):
     if message.author == client.user:
         return
 
-    if message.content.startswith('!random') or message.content.startswith('!рандом'):
+    if message.content.lower().startswith('!random') or message.content.lower().startswith('!рандом'):
         await choise_random(message)
         
 

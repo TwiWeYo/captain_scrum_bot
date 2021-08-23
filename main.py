@@ -6,25 +6,40 @@ guildname = 'talking scientific pizza'
 intents = discord.Intents.all()
 client = discord.Client(intents=intents)
 
-sad_prefixes = ['увы, но', 'вынужден огорчить, господа, но', 'вот незадача,', 'бесконечно извиняюсь, но', 'как ни прескорбно, но', 'сожалею, но именно сегодня', 'так уж вышло, что']
-joy_prefixes = ['счастливый случай выбрал {}', 'перенаправляем прожекторы... всё внимание на {}!', 'поздравляю! самый счастливый человек сегодня — {}', 'герой сегодняшнего дня — {}', 'а самый красивый голос в канале — у {}, вот послушайте', 'как ни крутись, но тут без {} не обойтись', 'победитель розыгрыша — {}', 'человек-легенда, лауреат премии "их выбрал рандом" — {}', 'случайности не случайны, {} знает это, как никто другой']
+sad_prefixes = ['увы, но', 'вынужден огорчить, господа, но', 'вот незадача,',
+                'бесконечно извиняюсь, но', 'как ни прескорбно, но',
+                'сожалею, но именно сегодня', 'так уж вышло, что']
+joy_prefixes = ['счастливый случай выбрал {}',
+                'перенаправляем прожекторы... всё внимание на {}!',
+                'поздравляю! самый счастливый человек сегодня — {}',
+                'герой сегодняшнего дня — {}', 'а самый красивый голос в канале — у {}, вот послушайте',
+                'как ни крутись, но тут без {} не обойтись', 'победитель розыгрыша — {}',
+                'человек-легенда, лауреат премии "их выбрал рандом" — {}',
+                'случайности не случайны, {} знает это, как никто другой',
+                'к микрофону приглашается MVP этого дня — {}',
+                'рецепт отличного дня: кофе + радуга + {}',
+                'сколько бота не корми, он всё равно на {} смотрит',
+                'is this a real life? is this just fantasy? (c) {}']
 
-random_memory = 5
-random_history = deque([])
+random_memory = 10
+random_history = dict([])
 
 def sad_prefix():
     return random.choice(sad_prefixes)
 
-
 def joy_prefix():
   return random.choice(joy_prefixes)
 
-
-def choise_member(members):
+def choise_member(guild, members):
     probabilities = {m: 1 for m in members}
-    for h in random_history:
+    if not guild in random_history:
+        random_history[guild] = deque([])
+
+    r_hist = random_history[guild]
+    for h in r_hist:
         if h in probabilities:
             probabilities[h] /= 2
+
     p = []
     v = []
     for val, pr in probabilities.items():
@@ -33,10 +48,10 @@ def choise_member(members):
             
     choosen_one = random.choices(v, p)[0]
     # очищаем из памяти тех, кого давно запомнили
-    while len(random_history) >= random_memory:
-        random_history.popleft()
+    while len(r_hist) >= random_memory:
+        r_hist.popleft()
     # добавляем сегодняшнего счастливчика
-    random_history.append(choosen_one)
+    r_hist.append(choosen_one)
     return choosen_one
 
 async def choise_random(message):
@@ -55,7 +70,7 @@ async def choise_random(message):
         await message.channel.send(f'{sad_prefix()} в канале "{channel_name}" никого нет')
         return
 
-    await message.channel.send(joy_prefix().format(choise_member(members).mention))
+    await message.channel.send(joy_prefix().format(choise_member(guild, members).mention))
 
 
 async def get_channel(message):

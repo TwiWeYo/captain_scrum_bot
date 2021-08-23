@@ -69,7 +69,7 @@ async def choise_random(message):
         await message.channel.send(f'{sad_prefix()} в канале "{channel_name}" никого нет')
         return
 
-    await message.channel.send(joy_prefix().format(choise_member(guild, members).mention))
+    await message.channel.send(joy_prefix().format(choise_member(message.guild, members).mention))
 
 
 async def get_channel(message):

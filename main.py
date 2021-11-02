@@ -24,13 +24,16 @@ joy_prefixes = ['счастливый случай выбрал {}',
 random_memory = 10
 random_history = dict([])
 
+
 def sad_prefix():
     return random.choice(sad_prefixes)
 
-def joy_prefix():
-  return random.choice(joy_prefixes)
 
-def choise_member(guild, members):
+def joy_prefix():
+    return random.choice(joy_prefixes)
+
+
+def choose_member(guild, members):
     probabilities = {m: 1 for m in members}
     if not guild in random_history:
         random_history[guild] = deque([])
@@ -45,32 +48,33 @@ def choise_member(guild, members):
     for val, pr in probabilities.items():
         v.append(val)
         p.append(pr)
-            
-    choosen_one = random.choices(v, p)[0]
+
+    chosen_one = random.choices(v, p)[0]
     # очищаем из памяти тех, кого давно запомнили
     while len(r_hist) >= random_memory:
         r_hist.popleft()
     # добавляем сегодняшнего счастливчика
-    r_hist.append(choosen_one)
-    return choosen_one
+    r_hist.append(chosen_one)
+    return chosen_one
 
-async def choise_random(message):
+
+async def choose_random(message):
     args = message.content.split()
 
     if len(args) >= 2:
         channel = await get_channel_byname(message, args[1])
     else:
         channel = await get_channel(message)
-        
+
     if not channel:
         return
 
     members = channel.members
     if not members:
-        await message.channel.send(f'{sad_prefix()} в канале "{channel_name}" никого нет')
+        await message.channel.send(f'{sad_prefix()} в канале "{channel.name}" никого нет')
         return
 
-    await message.channel.send(joy_prefix().format(choise_member(message.guild, members).mention))
+    await message.channel.send(joy_prefix().format(choose_member(message.guild, members).mention))
 
 
 async def get_channel(message):
@@ -103,7 +107,7 @@ async def on_message(message):
         return
 
     if message.content.lower().startswith('!random') or message.content.lower().startswith('!рандом'):
-        await choise_random(message)
-        
+        await choose_random(message)
+
 
 client.run('TOKEN')

@@ -19,11 +19,15 @@ joy_prefixes = ['счастливый случай выбрал {}',
                 'рецепт отличного дня: кофе + радуга + {}',
                 'сколько бота не корми, он всё равно на {} смотрит',
                 'here we go again (c) {}',
-                'вышел месяц из тумана, вынул ножик из кармана: "буду резать, буду бить, всё равно {} водить"']
+                'вышел месяц из тумана, вынул ножик из кармана: "буду резать, буду бить, всё равно {} водить"',
+                'и премия "ЗОТОЙ СТЕНДАПОФОН" вручается... {}!',
+                'May the Force be with {}',
+                'Моя мама всегда говорила: "Жизнь как коробка шоколадных конфет: никогда не знаешь, какая начинка {} попадётся"',
+                'А вот и {}!']
 
 random_memory = 10
 random_history = dict([])
-
+prev_choices = dict([])
 
 def sad_prefix():
     return random.choice(sad_prefixes)
@@ -42,6 +46,11 @@ def choose_member(guild, members):
     for h in r_hist:
         if h in probabilities:
             probabilities[h] /= 2
+            
+    if (guild in prev_choices):
+        probabilities[prev_choices[guild]] = 0
+        
+    print(probabilities)
 
     p = []
     v = []
@@ -55,6 +64,9 @@ def choose_member(guild, members):
         r_hist.popleft()
     # добавляем сегодняшнего счастливчика
     r_hist.append(chosen_one)
+
+    prev_choices[guild] = chosen_one
+
     return chosen_one
 
 

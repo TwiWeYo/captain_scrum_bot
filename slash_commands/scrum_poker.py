@@ -7,7 +7,8 @@ async def scrum_poker_command(message, topic):
 async def vote(self, interaction : discord.Interaction, button : discord.ui.Button, votes: dict):
     votes[interaction.user] = int(button.label) if button.label else 0
 
-    await interaction.response.send_message(f'Вы выбрали {votes[interaction.user]}', ephemeral=True)
+    await interaction.response.defer()
+    await interaction.followup.send(f'Вы выбрали {votes[interaction.user]}', ephemeral=True)
 
     await interaction.response.edit_message(view=self)
 
@@ -51,13 +52,17 @@ class VotesView(discord.ui.View):
         for child in self.children:
             child.disabled = True
 
+        await interaction.response.edit_message(view=self)
+
         average = 0
         for user in self.votes:
             username = user.nick if user.nick else user.name
             await interaction.channel.send(f'{username} - {self.votes[user]}')
             average += self.votes[user]
 
+        if average == 0:
+            await interaction.channel.send('Никто не пришел на фан-встречу(')
+            return
+
         average /= len(self.votes)
         await interaction.channel.send(f'Голосование ***"{self.topic}"*** завершено.\nСреднее арифметическое: **{round(average, 2)}**\nСреднее глазометрическое: **{round(average)}**')
-
-        await interaction.response.edit_message(view=self)

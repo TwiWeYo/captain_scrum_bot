@@ -55,9 +55,10 @@ class VotesView(discord.ui.View):
         await interaction.response.edit_message(view=self)
 
         average = 0
+        result = ''
         for user in self.votes:
             username = user.nick if user.nick else user.name
-            await interaction.channel.send(f'{username} - {self.votes[user]}')
+            result += f'{username} - {self.votes[user]}\n'
             average += self.votes[user]
 
         if average == 0:
@@ -65,4 +66,5 @@ class VotesView(discord.ui.View):
             return
 
         average /= len(self.votes)
-        await interaction.channel.send(f'Голосование ***"{self.topic}"*** завершено.\nСреднее арифметическое: **{round(average, 2)}**\nСреднее глазометрическое: **{round(average)}**')
+        result += f'Голосование ***"{self.topic}"*** завершено.\nСреднее арифметическое: **{round(average, 2)}**\nСреднее глазометрическое: **{round(average)}**'
+        await interaction.channel.send(result)

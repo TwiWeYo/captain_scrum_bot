@@ -1,5 +1,6 @@
 import random
 from collections import deque
+import datetime
 from utils import get_channel, get_channel_byname, joy_prefix, sad_prefix
 
 random_memory = 10
@@ -39,6 +40,7 @@ def choose_member(guild, members):
 
 
 async def choose_random_command(message, ch_name = None):
+    extra_prefix = ''
 
     if ch_name:
         channel = await get_channel_byname(message, ch_name)
@@ -52,5 +54,8 @@ async def choose_random_command(message, ch_name = None):
     if not members:
         await message.channel.send(f'{sad_prefix()} в канале "{channel.name}" никого нет')
         return
+    
+    if datetime.datetime.today().weekday() == 2:
+        extra_prefix = '🐸'
 
-    await message.channel.send(joy_prefix().format(choose_member(message.guild, members).mention))
+    await message.channel.send(joy_prefix().format(choose_member(message.guild, members).mention) + extra_prefix)

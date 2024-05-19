@@ -1,7 +1,8 @@
 import discord
+from discord.ext import commands
 
-async def scrum_poker_command(message, topic):    
-    await message.channel.send(topic, view=VotesView(topic))
+async def scrum_poker_command(message:commands.Context, topic):
+    await message.channel.send(topic, view=VotesView(topic, message.author))
 
 
 async def vote(self, interaction : discord.Interaction, button : discord.ui.Button, votes: dict):
@@ -13,10 +14,11 @@ async def vote(self, interaction : discord.Interaction, button : discord.ui.Butt
     await interaction.response.edit_message(view=self)
 
 class VotesView(discord.ui.View):
-    def __init__(self, topic):
+    def __init__(self, topic, author):
         super().__init__()
         self.votes = dict([])
         self.topic = topic
+        self.author = author
 
 
     @discord.ui.button(label='3', row=0, style=discord.ButtonStyle.secondary)
@@ -47,8 +49,12 @@ class VotesView(discord.ui.View):
     async def vote_100(self, interaction : discord.Interaction, button : discord.ui.Button):
         await vote(self, interaction, button, self.votes)
 
-    @discord.ui.button(label = 'Завершить', row=0, style=discord.ButtonStyle.danger)
+    @discord.ui.button(label = 'Подсчёт голосов', row=0, style=discord.ButtonStyle.danger)
     async def button_callback_finish(self, interaction : discord.Interaction, button : discord.ui.Button):
+        if interaction.user.id != self.author.id:
+            await interaction.response.send_message("Только автор может закончить подсчет голосов", ephemeral=True)
+            return
+
         for child in self.children:
             child.disabled = True
 
